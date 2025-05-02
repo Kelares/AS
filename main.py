@@ -12,7 +12,7 @@ bg_idx = name2id.get('background')   # index for 'background'
 from picamera2 import Picamera2
 from PIL import Image
 import time
-from libcamera import ColorSpace
+from libcamera import Transform
 
 # Initialize the camera
 picam2 = Picamera2()
@@ -26,7 +26,8 @@ config = picam2.create_still_configuration(
     lores=None,
     display=None,
     raw=None,
-    buffer_count=1
+    buffer_count=1,
+    transform=Transform(vflip=True)
 )
 picam2.configure(config)
 
@@ -34,7 +35,7 @@ picam2.configure(config)
 picam2.start(show_preview=False)
 time.sleep(2)
 picam2.set_controls({
-    "ScalerCrop": (0,0, *full_res),
+    "ScalerCrop": (0,0, 3280, 2464),
 })
 
 # Allow settings to settle
@@ -47,7 +48,7 @@ print("ColourGains:", meta.get("ColourGains"))
 # Capture image
 image = picam2.capture_array()
 Image.fromarray(image).save("took.png", quality=95)
-
+print(image.shape)
 picam2.stop()
 
 
