@@ -48,32 +48,30 @@ meta = picam2.capture_metadata()
 print("ScalerCrop now:", meta["ScalerCrop"])  # Should show full frame'
 print("max", picam2.camera_properties)
 print("ColourGains:", meta.get("ColourGains"))
-# Capture image
-image = picam2.capture_array()
-Image.fromarray(image).save("took.png", quality=95)
-print(image.shape)
-picam2.stop()
 
+for i in range(100):
+    image = picam2.capture_array()
+    Image.fromarray(image).save(f"images/took_{i}.png", quality=95)
 
-# 4. Run classification
-r = model.predict(
-    source=image,
-    imgsz=224
-)[0]  # single Results object
+    # 4. Run classification
+    r = model.predict(
+        source=image,
+        imgsz=224
+    )[0]  # single Results object
 
-# 5. Extract raw tensor, move to CPU, convert to numpy
-probs = r.probs.data.cpu().numpy()  # shape (num_classes,)
+    # 5. Extract raw tensor, move to CPU, convert to numpy
+    probs = r.probs.data.cpu().numpy()  # shape (num_classes,)
 
-# 6. Iterate from highest to lowest confidence
-for cls in np.argsort(probs)[::-1]:
-    conf = probs[cls]
-    # skip background or anything ≤ 0.8
-    if cls == bg_idx or conf <= 0.8:
-        continue
+    # 6. Iterate from highest to lowest confidence
+    for cls in np.argsort(probs)[::-1]:
+        conf = probs[cls]
+        # skip background or anything ≤ 0.8
+        if cls == bg_idx or conf <= 0.8:
+            continue
 
-    label = model.names[cls]
-    # print to console
-    print(f"Detected: {label} ({conf:.2f})")
+        label = model.names[cls]
+        # print to console
+        print(f"Detected: {label} ({conf:.2f})")
 
 
 picam2.stop()
