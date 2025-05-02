@@ -18,8 +18,10 @@ from libcamera import Transform
 picam2 = Picamera2()
 
 # Grab the exact full sensor resolution
-full_res = next(m["size"] for m in picam2.sensor_modes if m["size"] == (3280, 2464))
+full_res = (640, 480)
+#full_res = next(m["size"] for m in picam2.sensor_modes if m["size"] == (3280, 2464))
 #full_rest = (224,224)
+
 # Force a clean still config with no preview and no lores
 config = picam2.create_still_configuration(
     main={"size": full_res}, #, "format": "RGB888"},
