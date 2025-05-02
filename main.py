@@ -72,6 +72,7 @@ for i in range(100):
         label = model.names[cls]
         # print to console
         print(f"Detected: {label} ({conf:.2f})")
+    Image.fromarray(image).save(f"images/{label}_{i}.png", quality=95)
 
 
 picam2.stop()
