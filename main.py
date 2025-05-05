@@ -3,7 +3,7 @@ import numpy as np
 from io import BytesIO
 
 # 1. Load your fine-tuned classification model
-model = YOLO('v11s.onnx', task='classify')
+model = YOLO('model.onnx', task='classify')
 
 # 2. Invert the names dict to map class name → index
 name2id = {v: k for k, v in model.names.items()}
@@ -18,7 +18,9 @@ from libcamera import Transform
 picam2 = Picamera2()
 
 # Grab the exact full sensor resolution
+#full_res = (3280,2464) #(1920, 1080) 
 full_res = (640, 480)
+
 #full_res = next(m["size"] for m in picam2.sensor_modes if m["size"] == (3280, 2464))
 #full_rest = (224,224)
 
@@ -49,9 +51,9 @@ print("ScalerCrop now:", meta["ScalerCrop"])  # Should show full frame'
 print("max", picam2.camera_properties)
 print("ColourGains:", meta.get("ColourGains"))
 
-for i in range(100):
+for i in range(1000):
     image = picam2.capture_array()
-    Image.fromarray(image).save(f"images/took_{i}.png", quality=95)
+    #Image.fromarray(image).save(f"images/took_{i}.png", quality=95)
 
     # 4. Run classification
     r = model.predict(
@@ -72,8 +74,9 @@ for i in range(100):
         label = model.names[cls]
         # print to console
         print(f"Detected: {label} ({conf:.2f})")
-    Image.fromarray(image).save(f"images/{label}_{i}.png", quality=95)
-
+        Image.fromarray(image).save(f"images/{label}_{i}.png", quality=95)
+        print(f"images/{label}_{i}.png")
+        time.sleep(1)
 
 picam2.stop()
 
