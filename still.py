@@ -27,6 +27,10 @@ picam2.set_controls({
 
 # Allow settings to settle
 time.sleep(1)
+meta = picam2.capture_metadata()
+print("ScalerCrop now:", meta["ScalerCrop"])  # Should show full frame'
+print("max", picam2.camera_properties)
+print("ColourGains:", meta.get("ColourGains"))
 
 # Check the actual scaler crop
 image = picam2.capture_array()

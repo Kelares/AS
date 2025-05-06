@@ -54,6 +54,7 @@ print("ColourGains:", meta.get("ColourGains"))
 
 from gpiozero import DistanceSensor
 ultrasonic = DistanceSensor(echo=17, trigger=4)
+print("READY TO WORK")
 while True:
     ultrasonic.wait_for_in_range()
     s = time.time()
