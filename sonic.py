@@ -59,8 +59,8 @@ from gpiozero import DistanceSensor, Servo
 ultrasonic = DistanceSensor(echo=17, trigger=4)
 
 # Use GPIO17 (pin 11) — adjust if using another pin
-servo_l = Servo(18)
-servo_r = Servo(27)
+servo_r = Servo(18)
+servo_l = Servo(27)
 
 print("READY TO WORK")
 try:
