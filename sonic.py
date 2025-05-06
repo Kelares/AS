@@ -52,12 +52,12 @@ print("ScalerCrop now:", meta["ScalerCrop"])  # Should show full frame'
 print("max", picam2.camera_properties)
 print("ColourGains:", meta.get("ColourGains"))
 
-choices = {}
 from gpiozero import DistanceSensor
 ultrasonic = DistanceSensor(echo=17, trigger=4)
 while True:
     ultrasonic.wait_for_in_range()
     s = time.time()
+    choices = {}
     for i in range(50):
         image = picam2.capture_array()
         #Image.fromarray(image).save(f"images/took_{i}.png", quality=95)
@@ -89,7 +89,8 @@ while True:
             #print(f"images/{label}_{i}.png")
     print(time.time() - s, "seconds")
     print(choices)
-    print(max(choices, key=lambda x: choices[x]))
+    if choices:
+        print(max(choices, key=lambda x: choices[x]))
 
 picam2.stop()
 
