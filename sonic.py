@@ -10,6 +10,9 @@ print(model.names.items())
 name2id = {v: k for k, v in model.names.items()}
 bg_idx = name2id.get('background')   # index for 'background'
 
+left = ("paper", "cardboard")
+right = ("metal", "glass", "plastic")
+
 from picamera2 import Picamera2
 from PIL import Image
 import time
@@ -52,46 +55,65 @@ print("ScalerCrop now:", meta["ScalerCrop"])  # Should show full frame'
 print("max", picam2.camera_properties)
 print("ColourGains:", meta.get("ColourGains"))
 
-from gpiozero import DistanceSensor
+from gpiozero import DistanceSensor, Servo
 ultrasonic = DistanceSensor(echo=17, trigger=4)
+
+# Use GPIO17 (pin 11) — adjust if using another pin
+servo_l = Servo(18)
+servo_r = Servo(27)
+
 print("READY TO WORK")
-while True:
-    ultrasonic.wait_for_in_range()
-    s = time.time()
-    choices = {}
-    for i in range(50):
-        image = picam2.capture_array()
-        #Image.fromarray(image).save(f"images/took_{i}.png", quality=95)
+try:
+    while True:
+        ultrasonic.wait_for_in_range()
+        s = time.time()
+        choices = {}
+        for i in range(50):
+            image = picam2.capture_array()
+            #Image.fromarray(image).save(f"images/took_{i}.png", quality=95)
 
-        # 4. Run classification
-        r = model.predict(
-            source=image,
-            imgsz=224
-        )[0]  # single Results object
+            # 4. Run classification
+            r = model.predict(
+                source=image,
+                imgsz=224
+            )[0]  # single Results object
 
-        # 5. Extract raw tensor, move to CPU, convert to numpy
-        probs = r.probs.data.cpu().numpy()  # shape (num_classes,)
+            # 5. Extract raw tensor, move to CPU, convert to numpy
+            probs = r.probs.data.cpu().numpy()  # shape (num_classes,)
 
-        # 6. Iterate from highest to lowest confidence
-        for cls in np.argsort(probs)[::-1]:
-            conf = probs[cls]
-            # skip background or anything ≤ 0.8
-            if cls == bg_idx or conf <= 0.8:
-                continue
+            # 6. Iterate from highest to lowest confidence
+            for cls in np.argsort(probs)[::-1]:
+                conf = probs[cls]
+                # skip background or anything ≤ 0.8
+                if cls == bg_idx or conf <= 0.8:
+                    continue
 
-            label = model.names[cls]
-            if label in choices:
-                choices[label] += 1
-            else:
-                choices[label] = 1
-            # print to console
-            print(f"Detected: {label} ({conf:.2f})")
-            #Image.fromarray(image).save(f"images/{label}_{i}.png", quality=95)
-            #print(f"images/{label}_{i}.png")
-    print(time.time() - s, "seconds")
-    print(choices)
-    if choices:
-        print(max(choices, key=lambda x: choices[x]))
+                label = model.names[cls]
+                if label in choices:
+                    choices[label] += 1
+                else:
+                    choices[label] = 1
+                # print to console
+                print(f"Detected: {label} ({conf:.2f})")
+                #Image.fromarray(image).save(f"images/{label}_{i}.png", quality=95)
+                #print(f"images/{label}_{i}.png")
+        print(time.time() - s, "seconds")
+        print(choices)
+        if choices:
+            label = max(choices, key=lambda x: choices[x])
+            print(label)
 
-picam2.stop()
+            if label in left:
+                print("Left")
+                servo_l.max()
+                time.sleep(5)
+                servo_l.min()
+            elif label in right:
+                print("right")
+                servo_r.min()
+                time.sleep(5)
+                servo_r.max()
+except KeyboardInterrupt:
+    print("Exiting...")
+    picam2.stop()
 
