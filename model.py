@@ -129,20 +129,21 @@ try:
         if choices:
             label = max(choices, key=lambda x: choices[x])
             print(label)
+            if choices[label] > 3:
 
-            if label in left:
-                legit = True
-                print("Left")
-                #servo_l.max()
-                time.sleep(5)
-                #servo_l.min()
+                if label in left:
+                    legit = True
+                    print("Left")
+                    #servo_l.max()
+                    time.sleep(5)
+                    #servo_l.min()
 
-            elif label in right:
-                legit = False
-                print("right")
-               # servo_r.min()
-                time.sleep(5)
-                #servo_r.max()
+                elif label in right:
+                    legit = False
+                    print("right")
+                # servo_r.min()
+                    time.sleep(5)
+                    #servo_r.max()
 
         if not legit:
             dummy_event = Event()
