@@ -64,8 +64,8 @@ yellow_led = LED(15)
 red_led = LED(26)
 
 # Use GPIO17 (pin 11) — adjust if using another pin
-servo_r = Servo(18)
-servo_l = Servo(12)
+#servo_r = Servo(18)
+#servo_l = Servo(12)
 
 def blink_led(event, led, timer = None):
     try:
@@ -133,16 +133,16 @@ try:
             if label in left:
                 legit = True
                 print("Left")
-                servo_l.max()
+                #servo_l.max()
                 time.sleep(5)
-                servo_l.min()
+                #servo_l.min()
 
             elif label in right:
                 legit = False
                 print("right")
-                servo_r.min()
+               # servo_r.min()
                 time.sleep(5)
-                servo_r.max()
+                #servo_r.max()
 
         if not legit:
             dummy_event = Event()
